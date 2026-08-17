@@ -1,0 +1,7 @@
+{
+  "name": "Prestamos",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
