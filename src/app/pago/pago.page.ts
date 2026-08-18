@@ -155,6 +155,22 @@ export class PagoPage implements OnInit {
     window.print();
   }
 
+  // 4. NUEVA FUNCIÓN: Envía los datos del cliente al formulario principal para renovar
+  renovarPrestamo() {
+    const datosClienteParaRenovar = {
+      clientName: this.data.clientName,
+      clientCedula: this.data.clientCedula,
+      clientPhone: this.data.clientPhone,
+      clientAddress: this.data.clientAddress
+    };
+
+    // Guardamos en localStorage para que el componente PrincipalPage los lea y auto-llene
+    localStorage.setItem('datosRenovacion', JSON.stringify(datosClienteParaRenovar));
+
+    // Navegamos al formulario principal
+    this.router.navigate(['/principal']);
+  }
+
   goBack() {
     this.router.navigate(['/clientes']);
   }

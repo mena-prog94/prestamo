@@ -44,8 +44,11 @@
     <ion-button expand="block" color="primary" (click)="printReceipt()" style="margin-bottom: 12px;">
       🖨️ Imprimir Recibo
     </ion-button>
+  <ion-button *ngIf="data && data.pagosRegistrados >= data.totalInstallments" color="success" expand="block" (click)="renovarPrestamo()">
+  Renovar Préstamo
+</ion-button>
 
-    <ion-button expand="block" fill="outline" color="medium" (click)="goBack()">
+    <ion-button class="button-group" style="margin-top: 25px;" expand="block" fill="outline" color="medium" (click)="goBack()">
       ← Volver a la Lista de Clientes
     </ion-button>
   </div>

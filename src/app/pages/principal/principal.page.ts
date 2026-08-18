@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -43,7 +43,7 @@ import { Firestore, collection, addDoc } from '@angular/fire/firestore';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class PrincipalPage {
+export class PrincipalPage implements OnInit {
   clientName: string = '';
   clientCedula: string = '';
   clientPhone: string = '';
@@ -62,7 +62,39 @@ export class PrincipalPage {
     private router: Router,
     private firestore: Firestore
   ) {}
-  
+
+  ngOnInit() {
+    // Se mantiene por compatibilidad inicial
+  }
+
+  // Usamos ionViewWillEnter para asegurar que se cargue cada vez que entres a la pantalla Principal
+  ionViewWillEnter() {
+    const datosRenovacion = localStorage.getItem('datosRenovacion');
+    if (datosRenovacion) {
+      const cliente = JSON.parse(datosRenovacion);
+      this.clientName = cliente.clientName || '';
+      this.clientCedula = cliente.clientCedula || '';
+      this.clientPhone = cliente.clientPhone || '';
+      this.clientAddress = cliente.clientAddress || '';
+      
+      // Limpiamos para que no se quede pegado si entra manualmente después
+      localStorage.removeItem('datosRenovacion');
+    }
+  }
+
+  // Función centralizada para limpiar todos los inputs del formulario
+  limpiarFormulario() {
+    this.clientName = '';
+    this.clientCedula = '';
+    this.clientPhone = '';
+    this.clientAddress = '';
+    this.loanAmount = null;
+    this.loanType = 'semanal';
+    this.totalInterest = 0;
+    this.totalToPay = 0;
+    this.installmentAmount = 0;
+    this.totalInstallments = 0;
+  }
 
   calculateLoan() {
     if (!this.loanAmount || this.loanAmount <= 0) {
@@ -120,7 +152,7 @@ export class PrincipalPage {
       totalToPay: this.totalToPay,
       installmentAmount: this.installmentAmount,
       totalInstallments: this.totalInstallments,
-      pagosRegistrados: 0, // Inicializa los pagos en 0 para el control de cuotas
+      pagosRegistrados: 0, 
       contratoFirmado: contratoTexto,
       createdAt: new Date()
     };
@@ -130,34 +162,19 @@ export class PrincipalPage {
       const loansRef = collection(this.firestore, 'loans');
       const docRef = await addDoc(loansRef, loanData);
       
-      // Asignar el ID generado por Firebase al objeto local
       const loanDataWithId = { id: docRef.id, ...loanData };
-
-      // 2. Guardar en localStorage para garantizar que la página de contrato o pagos los reciba sin errores
       localStorage.setItem('currentLoanContract', JSON.stringify(loanDataWithId));
 
-      // 3. Alerta de éxito
+      // 2. Alerta de éxito
       const alert = await this.alertController.create({
         header: '¡Guardado Exitoso!',
-        message: 'El préstamo se ha registrado correctamente en Firebase.',
+        message: 'El préstamo se ha registrado correctamente.',
         buttons: [
           {
             text: 'Aceptar',
             handler: () => {
-              // 4. Navegar a la página del contrato
-              this.router.navigate(['/contrato',, docRef.id]);
-
-              // 5. Limpiar campos
-              this.clientName = '';
-              this.clientCedula = '';
-              this.clientPhone = '';
-              this.clientAddress = '';
-              this.loanAmount = null;
-              this.loanType = 'semanal';
-              this.totalInterest = 0;
-              this.totalToPay = 0;
-              this.installmentAmount = 0;
-              this.totalInstallments = 0;
+              this.router.navigate(['/contrato', docRef.id]);
+              this.limpiarFormulario();
             }
           }
         ]
@@ -175,10 +192,7 @@ export class PrincipalPage {
     }
   }
   
-  // 4. Mostrar alerta de confirmación
   async confirmarCerrarSesion() {
-    
-
     const alert = await this.alertController.create({
       header: 'Cerrar Sesión',
       message: '¿Estás seguro de que deseas salir de la aplicación?',
@@ -200,12 +214,7 @@ export class PrincipalPage {
     await alert.present();
   }
 
-  // 5. Lógica para limpiar la sesión y redirigir
   cerrarSesionAccion() {
-    // Aquí limpias tu almacenamiento o tokens si usas (ej. localStorage.clear())
-    // localStorage.removeItem('token');
-    
-    // Redirige al usuario a la pantalla de login (cambia '/login' por tu ruta real)
     this.router.navigate(['/login'], { replaceUrl: true });
   }
 }
