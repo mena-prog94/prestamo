@@ -1,0 +1,52 @@
+/* Estilos mejorados para el menú lateral */
+ion-menu {
+  ion-header {
+    ion-toolbar {
+      --background: #0f172a; // Azul oscuro profesional a juego con tu app
+      --color: #ffffff;
+      
+      ion-title {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  ion-content {
+    --background: #0f172a; // Fondo oscuro continuo para el menú
+    --color: #ffffff;
+
+    ion-list {
+      background: transparent;
+      padding: 15px 10px;
+
+      ion-item {
+        --background: transparent;
+        --color: #cbd5e1; // Texto gris claro muy legible en fondos oscuros
+        --padding-start: 16px;
+        --padding-end: 16px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.25s ease;
+
+        /* Efecto hover moderno */
+        &:hover {
+          --background: rgba(56, 189, 248, 0.1);
+          --color: #38bdf8;
+        }
+
+        /* Opción activa (página actual) */
+        &.item-router-link-active {
+          --background: #38bdf8; // Azul brillante distintivo
+          --color: #0f172a;      // Texto oscuro para contraste perfecto
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+      }
+    }
+  }
+}
+.primary{
+     --background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}

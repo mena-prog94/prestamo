@@ -1,0 +1,205 @@
+/* Fondo con degradado elegante idéntico al resto de la app */
+.bg-mena {
+  --background: radial-gradient(circle at 50% 20%, #1e3a8a 0%, #0f172a 70%, #020617 100%);
+}
+
+.main-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 10px;
+}
+
+/* Tarjeta del contrato con efecto cristal (Glassmorphism) */
+.contract-card {
+  background: rgba(255, 255, 255, 0.95); /* Fondo blanco sólido o translúcido para que imprima y se lea perfecto */
+  color: #0f172a;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contract-header {
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.contract-header h2 {
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: #1e3a8a;
+  margin: 0 0 5px 0;
+  letter-spacing: 1px;
+}
+
+.contract-header p {
+  color: #059669;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+.contract-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.contract-body ul {
+  background: #f8fafc;
+  padding: 15px 25px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin: 20px 0;
+  list-style-type: square;
+}
+
+.contract-body li {
+  margin-bottom: 8px;
+}
+
+.signature-line {
+  margin-top: 45px;
+  text-align: center;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.button-group {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media print {
+  /* Ocultar botones y menús */
+  .button-group, ion-header, .no-print {
+    display: none !important;
+  }
+  
+  /* Asegurar que el fondo sea blanco y el texto negro para ahorrar tinta */
+  body, .bg-mena {
+    background: white !important;
+    --background: white !important;
+  }
+
+  /* Asegurar que la tarjeta sea visible y ocupe el ancho total */
+  .contract-card {
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .contract-header h2, .contract-header p {
+    color: black !important;
+  }
+}
+.bg-mena {
+  --background: radial-gradient(circle at 50% 20%, #1e3a8a 0%, #0f172a 70%, #020617 100%);
+}
+
+.main-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 10px;
+}
+
+.contract-card {
+  background: rgba(255, 255, 255, 0.98);
+  color: #0f172a;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.contract-header {
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+
+  h2 {
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #1e3a8a;
+    margin: 0 0 5px 0;
+  }
+
+  p {
+    color: #059669;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin: 0;
+    letter-spacing: 2px;
+  }
+}
+
+.contract-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* Colores personalizados para los textos en negrita */
+.text-highlight {
+  color: #1e3a8a; /* Azul institucional elegante */
+}
+
+.text-amount {
+  color: #059669; /* Verde financiero para resaltar el dinero */
+  font-size: 1.05rem;
+}
+
+.conditions-box {
+  background: #f8fafc;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin: 15px 0;
+
+  ul {
+    padding-left: 15px;
+    margin: 5px 0;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+}
+
+.signature-line {
+  margin-top: 40px;
+  text-align: center;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.button-group {
+  margin-top: 25px;
+}
+
+@media print {
+  .bg-mena {
+    --background: white !important;
+  }
+  .button-group {
+    display: none !important;
+  }
+  .contract-card {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+}

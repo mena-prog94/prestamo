@@ -1,0 +1,42 @@
+<ion-content class="ion-padding bg-mena">
+  <!-- Agregamos el ID aquí para que html2pdf reconozca el contenedor exacto -->
+  <div class="contract-card" id="contract-content">
+    <div class="contract-header">
+      <h2>CONTRATO DE PRÉSTAMO PERSONAL</h2>
+      <p>PRÉSTAMOS MENA</p>
+    </div>
+
+    <div class="contract-body" *ngIf="data">
+      <p>En la ciudad de Bonao, República Dominicana, a fecha de hoy <strong class="text-highlight">{{ currentDate }}</strong>, se formaliza el presente contrato entre:</p>
+      
+      <p><strong class="text-highlight">PRESTAMISTA:</strong> Jovanny Mena, portador de la cédula de identidad y electoral No. 402-2311606-2.</p>
+      
+      <p><strong class="text-highlight">PRESTATARIO:</strong> {{ data.clientName }}, portador(a) de la cédula No. {{ data.clientCedula }}, con domicilio en {{ data.clientAddress }}.</p>
+
+      <p>El Prestatario reconoce haber recibido en calidad de préstamo la suma de <strong class="text-amount">RD$ {{ data.loanAmount | number:'1.2-2' }}</strong>, comprometiéndose a devolver dicha cantidad bajo las siguientes condiciones:</p>
+
+      <div class="conditions-box">
+        <ul>
+          <li><strong class="text-highlight">Modalidad:</strong> Pago {{ data.loanType }}</li>
+          <li><strong class="text-highlight">Total a pagar (Capital + Interés):</strong> RD$ {{ data.totalToPay | number:'1.2-2' }}</li>
+          <li><strong class="text-highlight">Cantidad de cuotas:</strong> {{ data.totalInstallments }}</li>
+          <li><strong class="text-highlight">Valor por cuota:</strong> RD$ {{ data.installmentAmount | number:'1.2-2' }}</li>
+        </ul>
+      </div>
+
+      <p>El Prestatario acepta las condiciones estipuladas y se compromete al cumplimiento estricto del calendario de pagos.</p>
+    </div>
+
+    <div class="signature-line">
+      ___________________________<br>
+      <span class="text-highlight">Firma del Prestatario</span>
+    </div>
+  </div>
+
+  <!-- Botones de acción fuera del PDF -->
+  <div class="button-group">
+    <ion-button expand="block" (click)="printContract()">Imprimir Contrato</ion-button>
+    <ion-button expand="block" color="success" (click)="shareOnWhatsApp()">Enviar por WhatsApp 📱</ion-button>
+    <ion-button expand="block" fill="outline" color="medium" (click)="goBack()">Volver al Inicio</ion-button>
+  </div>
+</ion-content>

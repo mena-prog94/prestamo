@@ -1,0 +1,63 @@
+/* Fondo general de la página con el estilo oscuro de la app */
+.bg-mena {
+  --background: #0b1329;
+  --color: #ffffff;
+}
+
+/* Personalización de la barra de búsqueda */
+ion-searchbar {
+  --background: #131c38;
+  --color: #ffffff;
+  --placeholder-color: #94a3b8;
+  --icon-color: #38bdf8;
+  --border-radius: 12px;
+  padding-inline: 0;
+  margin-bottom: 20px;
+}
+
+/* Lista de clientes */
+.client-list {
+  background: transparent !important;
+
+  .client-item {
+    --background: #131c38; // Tarjeta oscura elegante
+    --color: #ffffff;
+    --border-radius: 12px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background 0.2s ease;
+
+    /* Efecto al pasar el mouse o presionar */
+    &:hover {
+      --background: #1a2442;
+      transform: translateY(-2px);
+    }
+
+    h2 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    p {
+      color: #94a3b8; // Texto secundario más suave y legible
+      font-size: 0.9rem;
+      margin: 2px 0;
+
+      &.loan-info {
+        color: #38bdf8; // Destaca los datos del préstamo en azul brillante
+        font-weight: 600;
+        margin-top: 6px;
+      }
+    }
+  }
+}
+
+/* Estado vacío cuando no hay clientes */
+.empty-state {
+  text-align: center;
+  margin-top: 60px;
+  color: #94a3b8;
+  font-size: 1rem;
+}

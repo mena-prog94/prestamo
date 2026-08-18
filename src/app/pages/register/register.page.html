@@ -1,0 +1,39 @@
+<ion-content class="ion-padding bg-mena">
+  <div class="register-container">
+    <!-- Branding Visual -->
+    <div class="brand-header">
+      <div class="logo-circle">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </div>
+      <h1>CREAR CUENTA</h1>
+      <p class="subtitle">Únete a Préstamos Mena</p>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div class="register-card">
+      <ion-item lines="none" class="custom-input">
+        <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+        <ion-input placeholder="Nombre completo" [(ngModel)]="name"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-icon slot="start" name="mail-outline" color="primary"></ion-icon>
+        <ion-input placeholder="Correo electrónico" [(ngModel)]="email"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-icon slot="start" name="lock-closed-outline" color="primary"></ion-icon>
+        <ion-input type="password" placeholder="Contraseña" [(ngModel)]="password"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" (click)="onRegister()" class="btn-register">
+        Registrarse
+      </ion-button>
+    </div>
+
+    <!-- Enlace para volver al Login -->
+    <div class="footer-contact" (click)="goToLogin()">
+      <p>¿Ya tienes una cuenta? <span class="highlight">Inicia sesión</span></p>
+    </div>
+  </div>
+</ion-content>

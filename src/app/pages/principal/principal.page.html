@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar class="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Préstamos Mena</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding bg-mena">
+  <div class="main-container">
+    <div class="brand-header">
+      <h1>GESTIÓN DE PRÉSTAMOS</h1>
+      <p class="subtitle">Préstamos Semanales y Quincenales</p>
+    </div>
+
+    <!-- Formulario de Préstamo y Cliente -->
+    <div class="form-card">
+      <h3>Datos del Cliente</h3>
+      <ion-item lines="none" class="custom-input">
+        <ion-input placeholder="Nombre completo" [(ngModel)]="clientName"></ion-input>
+      </ion-item>
+      
+      <ion-item lines="none" class="custom-input">
+        <ion-input placeholder="Cédula" [(ngModel)]="clientCedula"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-input type="tel" placeholder="Teléfono" [(ngModel)]="clientPhone"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-input">
+        <ion-input placeholder="Dirección completa" [(ngModel)]="clientAddress"></ion-input>
+      </ion-item>
+
+      <h3>Detalles del Préstamo</h3>
+      <ion-item lines="none" class="custom-input">
+        <ion-input type="number" placeholder="Monto a prestar" [(ngModel)]="loanAmount" (ionInput)="calculateLoan()"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="custom-select">
+        <ion-select placeholder="Seleccione modalidad" [(ngModel)]="loanType" (ionChange)="calculateLoan()">
+          <ion-select-option value="semanal">Semanal (13 Semanas)</ion-select-option>
+          <ion-select-option value="quincenal">Quincenal (7 Quincenas)</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Resultados del Cálculo -->
+      <div class="results-box" *ngIf="loanAmount && loanAmount > 0">
+        <p>Interés (30%): <strong>RD$ {{ totalInterest | number:'1.2-2' }}</strong></p>
+        <p>Total a pagar: <strong>RD$ {{ totalToPay | number:'1.2-2' }}</strong></p>
+        <p>Cuota por {{ loanType }}: <span class="highlight-cuota">RD$ {{ installmentAmount | number:'1.2-2' }}</span></p>
+      </div>
+
+      <ion-button expand="block" (click)="saveAndGenerateContract()" class="btn-action">
+        Guardar y Generar Contrato
+      </ion-button>
+<div class="contenedor">
+      <ion-buttons slot="end" >
+      <ion-button class="btn-action2" (click)="confirmarCerrarSesion()" title="Cerrar Sesión">Cerrar
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+</div>
+    </div>
+  </div>
+</ion-content>
