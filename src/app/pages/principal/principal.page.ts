@@ -51,11 +51,15 @@ export class PrincipalPage implements OnInit {
   
   loanAmount: number | null = null;
   loanType: string = 'semanal';
+  customQuincenas: number | null = null; // Cantidad ingresada por el usuario para más quincenas
 
   totalInterest: number = 0;
   totalToPay: number = 0;
   installmentAmount: number = 0;
   totalInstallments: number = 0;
+  
+  interestPercentage: number = 30; // Porcentaje dinámico para mostrar en pantalla
+  loanTypeLabel: string = 'semana'; // Etiqueta dinámica para la cuota
 
   constructor(
     private alertController: AlertController,
@@ -63,11 +67,8 @@ export class PrincipalPage implements OnInit {
     private firestore: Firestore
   ) {}
 
-  ngOnInit() {
-    // Se mantiene por compatibilidad inicial
-  }
+  ngOnInit() {}
 
-  // Usamos ionViewWillEnter para asegurar que se cargue cada vez que entres a la pantalla Principal
   ionViewWillEnter() {
     const datosRenovacion = localStorage.getItem('datosRenovacion');
     if (datosRenovacion) {
@@ -77,12 +78,10 @@ export class PrincipalPage implements OnInit {
       this.clientPhone = cliente.clientPhone || '';
       this.clientAddress = cliente.clientAddress || '';
       
-      // Limpiamos para que no se quede pegado si entra manualmente después
       localStorage.removeItem('datosRenovacion');
     }
   }
 
-  // Función centralizada para limpiar todos los inputs del formulario
   limpiarFormulario() {
     this.clientName = '';
     this.clientCedula = '';
@@ -90,10 +89,21 @@ export class PrincipalPage implements OnInit {
     this.clientAddress = '';
     this.loanAmount = null;
     this.loanType = 'semanal';
+    this.customQuincenas = null;
     this.totalInterest = 0;
     this.totalToPay = 0;
     this.installmentAmount = 0;
     this.totalInstallments = 0;
+    this.interestPercentage = 30;
+    this.loanTypeLabel = 'semana';
+  }
+
+  // Se ejecuta al cambiar la modalidad para limpiar o ajustar valores por defecto
+  onLoanTypeChange() {
+    if (this.loanType !== 'mas_quincenas') {
+      this.customQuincenas = null;
+    }
+    this.calculateLoan();
   }
 
   calculateLoan() {
@@ -105,20 +115,44 @@ export class PrincipalPage implements OnInit {
       return;
     }
 
-    // 30% de interés total
-    this.totalInterest = this.loanAmount * 0.30;
-    this.totalToPay = this.loanAmount + this.totalInterest;
-
+    // Definir interés y número de cuotas según la modalidad
     if (this.loanType === 'semanal') {
-      this.totalInstallments = 13; 
-    } else {
-      this.totalInstallments = 7;  
+      this.interestPercentage = 30;
+      this.totalInstallments = 13;
+      this.loanTypeLabel = 'semana';
+    } else if (this.loanType === 'quincenal') {
+      this.interestPercentage = 30;
+      this.totalInstallments = 7;
+      this.loanTypeLabel = 'quincena';
+    } else if (this.loanType === 'mas_quincenas') {
+      this.interestPercentage = 35; // Interés del 35% solicitado
+      this.totalInstallments = this.customQuincenas && this.customQuincenas > 0 ? this.customQuincenas : 0;
+      this.loanTypeLabel = 'quincena';
     }
 
-    this.installmentAmount = this.totalToPay / this.totalInstallments;
+    // Cálculo del interés y total a pagar
+    this.totalInterest = this.loanAmount * (this.interestPercentage / 100);
+    this.totalToPay = this.loanAmount + this.totalInterest;
+
+    if (this.totalInstallments > 0) {
+      this.installmentAmount = this.totalToPay / this.totalInstallments;
+    } else {
+      this.installmentAmount = 0;
+    }
   }
 
   async saveAndGenerateContract() {
+    // Validar si falta alguna quincena personalizada en caso de haber elegido esa opción
+    if (this.loanType === 'mas_quincenas' && (!this.customQuincenas || this.customQuincenas <= 0)) {
+      const alert = await this.alertController.create({
+        header: 'Cantidad de quincenas requerida',
+        message: 'Por favor ingrese la cantidad válida de quincenas para este préstamo.',
+        buttons: ['Aceptar']
+      });
+      await alert.present();
+      return;
+    }
+
     if (!this.clientName || !this.clientCedula || !this.clientPhone || !this.clientAddress || !this.loanAmount) {
       const alert = await this.alertController.create({
         header: 'Campos incompletos',
@@ -132,12 +166,14 @@ export class PrincipalPage implements OnInit {
     this.calculateLoan();
 
     const fechaActual = new Date().toLocaleDateString('es-DO', { year: 'numeric', month: 'long', day: 'numeric' });
+    const modalidadTexto = this.loanType === 'mas_quincenas' ? `${this.totalInstallments} Quincenas (Personalizadas)` : this.loanType;
+
     const contratoTexto = `CONTRATO DE PRÉSTAMO PERSONAL - PRÉSTAMOS MENA
     En la ciudad de Bonao, a fecha de hoy ${fechaActual}, se formaliza el préstamo con:
     PRESTAMISTA: Jovanny Mena, cédula 402-2311606-2.
     PRESTATARIO: ${this.clientName}, cédula ${this.clientCedula}, domicilio: ${this.clientAddress}.
     MONTO: RD$ ${this.loanAmount}.
-    MODALIDAD: ${this.loanType}.
+    MODALIDAD: ${modalidadTexto}.
     TOTAL A PAGAR: RD$ ${this.totalToPay}.
     VALOR CUOTA: RD$ ${this.installmentAmount}.`;
 
@@ -147,7 +183,7 @@ export class PrincipalPage implements OnInit {
       clientPhone: this.clientPhone,
       clientAddress: this.clientAddress,
       loanAmount: this.loanAmount,
-      loanType: this.loanType,
+      loanType: modalidadTexto,
       totalInterest: this.totalInterest,
       totalToPay: this.totalToPay,
       installmentAmount: this.installmentAmount,
@@ -158,14 +194,12 @@ export class PrincipalPage implements OnInit {
     };
 
     try {
-      // 1. Guardar en Firestore
       const loansRef = collection(this.firestore, 'loans');
       const docRef = await addDoc(loansRef, loanData);
       
       const loanDataWithId = { id: docRef.id, ...loanData };
       localStorage.setItem('currentLoanContract', JSON.stringify(loanDataWithId));
 
-      // 2. Alerta de éxito
       const alert = await this.alertController.create({
         header: '¡Guardado Exitoso!',
         message: 'El préstamo se ha registrado correctamente.',

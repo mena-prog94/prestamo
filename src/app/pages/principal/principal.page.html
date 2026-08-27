@@ -39,32 +39,39 @@
       </ion-item>
 
       <ion-item lines="none" class="custom-select">
-        <ion-select placeholder="Seleccione modalidad" [(ngModel)]="loanType" (ionChange)="calculateLoan()">
-          <ion-select-option value="semanal">Semanal (13 Semanas)</ion-select-option>
-          <ion-select-option value="quincenal">Quincenal (7 Quincenas)</ion-select-option>
+        <ion-select placeholder="Seleccione modalidad" [(ngModel)]="loanType" (ionChange)="onLoanTypeChange()">
+          <ion-select-option value="semanal">Semanal (13 Semanas - 30%)</ion-select-option>
+          <ion-select-option value="quincenal">Quincenal (7 Quincenas - 30%)</ion-select-option>
+          <ion-select-option value="mas_quincenas">Más Quincenas (35%)</ion-select-option>
         </ion-select>
+      </ion-item>
+
+      <!-- Campo condicional para ingresar la cantidad de quincenas personalizada -->
+      <ion-item lines="none" class="custom-input" *ngIf="loanType === 'mas_quincenas'">
+        <ion-input type="number" placeholder="Cantidad de quincenas" [(ngModel)]="customQuincenas" (ionInput)="calculateLoan()"></ion-input>
       </ion-item>
 
       <!-- Resultados del Cálculo -->
       <div class="results-box" *ngIf="loanAmount && loanAmount > 0">
-        <p>Interés (30%): <strong>RD$ {{ totalInterest | number:'1.2-2' }}</strong></p>
+        <p>Interés ({{ interestPercentage }}%): <strong>RD$ {{ totalInterest | number:'1.2-2' }}</strong></p>
         <p>Total a pagar: <strong>RD$ {{ totalToPay | number:'1.2-2' }}</strong></p>
-        <p>Cuota por {{ loanType }}: <span class="highlight-cuota">RD$ {{ installmentAmount | number:'1.2-2' }}</span></p>
+        <p>Cuota por {{ loanTypeLabel }}: <span class="highlight-cuota">RD$ {{ installmentAmount | number:'1.2-2' }}</span></p>
       </div>
 
       <ion-button expand="block" (click)="saveAndGenerateContract()" class="btn-action">
         Guardar y Generar Contrato
       </ion-button>
       <ion-button color="medium" expand="block" (click)="limpiarFormulario()">
-  Limpiar Formulario
-</ion-button>
-<div class="contenedor">
-      <ion-buttons slot="end" >
-      <ion-button class="btn-action2" (click)="confirmarCerrarSesion()" title="Cerrar Sesión">Cerrar
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+        Limpiar Formulario
       </ion-button>
-    </ion-buttons>
-</div>
+      
+      <div class="contenedor">
+        <ion-buttons slot="end">
+          <ion-button class="btn-action2" (click)="confirmarCerrarSesion()" title="Cerrar Sesión">Cerrar
+            <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </div>
     </div>
   </div>
 </ion-content>
