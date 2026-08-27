@@ -1,14 +1,14 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'Prestamos',
+  appId: 'com.company.appname',
+  appName: 'My Capacitor App',
   webDir: 'www',
   plugins: {
     LiveUpdates: {
-      appId: '437f73f4', // Reemplaza con tu App ID real de Appflow
-      channel: 'Production', // El canal desde donde se descargarán las actualizaciones
-      autoUpdateMethod: 'background', // Cómo se aplicarán ('background' o 'kill')
+      appId: '042a1261',
+      channel: 'Production',
+      autoUpdateMethod: 'background',
       maxVersions: 2
     }
   }

@@ -18,7 +18,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { receiptOutline, logOutOutline } from 'ionicons/icons'; // 2. Importar icono de salida
-
+import * as LiveUpdates from '@capacitor/live-updates';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -47,6 +47,25 @@ export class AppComponent {
   ) {
     // Registrar los iconos que se usan en el menú
     addIcons({ receiptOutline, logOutOutline });
+  }
+  async ngOnInit() {
+    await this.syncWithAppflow();
+  }
+  async syncWithAppflow() {
+    try {
+      const update = await LiveUpdates.sync();
+      // activeApplicationPathChanged es true si se descargó una nueva actualización
+      if (update.activeApplicationPathChanged) {
+        console.log('Nueva actualización aplicada correctamente.');
+        
+        // Opcional: puedes forzar la recarga de la app si lo requieres inmediatamente
+        // await LiveUpdates.reload();
+      } else {
+        console.log('La aplicación ya está actualizada con la última versión.');
+      }
+    } catch (error) {
+      console.error('Error al sincronizar con Live Updates:', error);
+    }
   }
 
   cerrarMenu() {
