@@ -1,3 +1,4 @@
+<!-- pago.page.html -->
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
@@ -38,17 +39,23 @@
   <!-- Botones de Acción -->
   <div class="button-group" style="margin-top: 25px;">
     <ion-button expand="block" color="success" (click)="confirmarRegistroPago()" style="margin-bottom: 12px;">
-  💵 Registrar Pago (Pago {{ (data?.pagosRegistrados || 0) + 1 }} de {{ data?.totalInstallments }}) y Enviar PDF
-</ion-button>
+      💵 Registrar Pago (Pago {{ (data?.pagosRegistrados || 0) + 1 }} de {{ data?.totalInstallments }})
+    </ion-button>
+
+    <!-- Nuevo botón específico para compartir PDF por WhatsApp -->
+    <ion-button expand="block" color="tertiary" (click)="compartirPdfWhatsApp()" style="margin-bottom: 12px;">
+      💬 Compartir PDF por WhatsApp
+    </ion-button>
 
     <ion-button expand="block" color="primary" (click)="printReceipt()" style="margin-bottom: 12px;">
       🖨️ Imprimir Recibo
     </ion-button>
-  <ion-button *ngIf="data && data.pagosRegistrados >= data.totalInstallments" color="success" expand="block" (click)="renovarPrestamo()">
-  Renovar Préstamo
-</ion-button>
 
-    <ion-button class="button-group" style="margin-top: 25px;" expand="block" fill="outline" color="medium" (click)="goBack()">
+    <ion-button *ngIf="data && data.pagosRegistrados >= data.totalInstallments" color="success" expand="block" (click)="renovarPrestamo()" style="margin-bottom: 12px;">
+      Renovar Préstamo
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="medium" (click)="goBack()">
       ← Volver a la Lista de Clientes
     </ion-button>
   </div>
