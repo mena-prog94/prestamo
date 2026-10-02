@@ -17,8 +17,6 @@ import {
   AlertController 
 } from '@ionic/angular/standalone';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
-// Importar herramientas de Firebase Firestore
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
 
 @Component({
@@ -51,15 +49,15 @@ export class PrincipalPage implements OnInit {
   
   loanAmount: number | null = null;
   loanType: string = 'semanal';
-  customQuincenas: number | null = null; // Cantidad ingresada por el usuario para más quincenas
+  customQuincenas: number | null = null;
 
   totalInterest: number = 0;
   totalToPay: number = 0;
   installmentAmount: number = 0;
   totalInstallments: number = 0;
   
-  interestPercentage: number = 30; // Porcentaje dinámico para mostrar en pantalla
-  loanTypeLabel: string = 'semana'; // Etiqueta dinámica para la cuota
+  interestPercentage: number = 30;
+  loanTypeLabel: string = 'semana';
 
   constructor(
     private alertController: AlertController,
@@ -77,7 +75,6 @@ export class PrincipalPage implements OnInit {
       this.clientCedula = cliente.clientCedula || '';
       this.clientPhone = cliente.clientPhone || '';
       this.clientAddress = cliente.clientAddress || '';
-      
       localStorage.removeItem('datosRenovacion');
     }
   }
@@ -98,7 +95,6 @@ export class PrincipalPage implements OnInit {
     this.loanTypeLabel = 'semana';
   }
 
-  // Se ejecuta al cambiar la modalidad para limpiar o ajustar valores por defecto
   onLoanTypeChange() {
     if (this.loanType !== 'mas_quincenas') {
       this.customQuincenas = null;
@@ -115,7 +111,6 @@ export class PrincipalPage implements OnInit {
       return;
     }
 
-    // Definir interés y número de cuotas según la modalidad
     if (this.loanType === 'semanal') {
       this.interestPercentage = 30;
       this.totalInstallments = 13;
@@ -125,12 +120,11 @@ export class PrincipalPage implements OnInit {
       this.totalInstallments = 7;
       this.loanTypeLabel = 'quincena';
     } else if (this.loanType === 'mas_quincenas') {
-      this.interestPercentage = 35; // Interés del 35% solicitado
+      this.interestPercentage = 35;
       this.totalInstallments = this.customQuincenas && this.customQuincenas > 0 ? this.customQuincenas : 0;
       this.loanTypeLabel = 'quincena';
     }
 
-    // Cálculo del interés y total a pagar
     this.totalInterest = this.loanAmount * (this.interestPercentage / 100);
     this.totalToPay = this.loanAmount + this.totalInterest;
 
@@ -142,11 +136,10 @@ export class PrincipalPage implements OnInit {
   }
 
   async saveAndGenerateContract() {
-    // Validar si falta alguna quincena personalizada en caso de haber elegido esa opción
     if (this.loanType === 'mas_quincenas' && (!this.customQuincenas || this.customQuincenas <= 0)) {
       const alert = await this.alertController.create({
-        header: 'Cantidad de quincenas requerida',
-        message: 'Por favor ingrese la cantidad válida de quincenas para este préstamo.',
+        header: 'Cantidad requerida',
+        message: 'Por favor ingrese una cantidad válida de quincenas.',
         buttons: ['Aceptar']
       });
       await alert.present();
@@ -156,7 +149,7 @@ export class PrincipalPage implements OnInit {
     if (!this.clientName || !this.clientCedula || !this.clientPhone || !this.clientAddress || !this.loanAmount) {
       const alert = await this.alertController.create({
         header: 'Campos incompletos',
-        message: 'Por favor complete todos los datos del cliente, dirección y el monto.',
+        message: 'Por favor complete todos los campos obligatorios.',
         buttons: ['Aceptar']
       });
       await alert.present();
@@ -197,9 +190,6 @@ export class PrincipalPage implements OnInit {
       const loansRef = collection(this.firestore, 'loans');
       const docRef = await addDoc(loansRef, loanData);
       
-      const loanDataWithId = { id: docRef.id, ...loanData };
-      localStorage.setItem('currentLoanContract', JSON.stringify(loanDataWithId));
-
       const alert = await this.alertController.create({
         header: '¡Guardado Exitoso!',
         message: 'El préstamo se ha registrado correctamente.',
@@ -207,7 +197,7 @@ export class PrincipalPage implements OnInit {
           {
             text: 'Aceptar',
             handler: () => {
-              this.router.navigate(['/contrato', docRef.id]);
+              this.router.navigate(['/pago', docRef.id]);
               this.limpiarFormulario();
             }
           }
@@ -219,7 +209,7 @@ export class PrincipalPage implements OnInit {
       console.error('Error al guardar en Firebase:', error);
       const alert = await this.alertController.create({
         header: 'Error',
-        message: 'No se pudo guardar el préstamo en la base de datos. Intente de nuevo.',
+        message: 'No se pudo guardar el préstamo. Intente de nuevo.',
         buttons: ['Aceptar']
       });
       await alert.present();
@@ -229,26 +219,12 @@ export class PrincipalPage implements OnInit {
   async confirmarCerrarSesion() {
     const alert = await this.alertController.create({
       header: 'Cerrar Sesión',
-      message: '¿Estás seguro de que deseas salir de la aplicación?',
+      message: '¿Estás seguro de que deseas salir?',
       buttons: [
-        {
-          text: 'No',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Sí',
-          handler: () => {
-            this.cerrarSesionAccion();
-          }
-        }
+        { text: 'No', role: 'cancel' },
+        { text: 'Sí', handler: () => this.router.navigate(['/login'], { replaceUrl: true }) }
       ]
     });
-
     await alert.present();
-  }
-
-  cerrarSesionAccion() {
-    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

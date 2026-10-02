@@ -14,7 +14,6 @@ import {
   IonButtons,
   IonMenuButton
 } from '@ionic/angular/standalone';
-
 import { Firestore, collection, getDocs, query, orderBy } from '@angular/fire/firestore';
 
 @Component({
@@ -53,7 +52,7 @@ export class ClientesPage implements OnInit {
   async cargarClientes() {
     try {
       const loansRef = collection(this.firestore, 'loans');
-      const q = query(loansRef, orderBy('clientName', 'asc')); // Ordenados alfabéticamente por nombre
+      const q = query(loansRef, orderBy('clientName', 'asc'));
       const querySnapshot = await getDocs(q);
 
       this.clientes = querySnapshot.docs.map(doc => ({
@@ -61,14 +60,12 @@ export class ClientesPage implements OnInit {
         ...doc.data()
       }));
 
-      // Inicialmente mostramos todos
       this.clientesFiltrados = [...this.clientes];
     } catch (error) {
       console.error('Error al cargar clientes:', error);
     }
   }
 
-  // Filtrar en tiempo real por el nombre del cliente o cédula
   filtrarClientes(event: any) {
     const texto = event.target.value ? event.target.value.toLowerCase().trim() : '';
     
@@ -78,12 +75,10 @@ export class ClientesPage implements OnInit {
     );
   }
 
-  // Al hacer clic en un cliente, te lleva directo a los detalles/contrato
   verDetalleContrato(cliente: any) {
-    localStorage.setItem('currentLoanContract', JSON.stringify(cliente));
-    this.router.navigate(['/pago'], { state: cliente });
+    // Navegación limpia pasando directamente el ID del documento
+    this.router.navigate(['/pago', cliente.id]);
   }
-
 
   goBack() {
     this.router.navigate(['/principal']);

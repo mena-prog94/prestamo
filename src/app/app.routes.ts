@@ -35,5 +35,8 @@ export const routes: Routes = [
     path: 'pago',
     loadComponent: () => import('./pago/pago.page').then( m => m.PagoPage)
   },
-  
+{
+  path: 'pago/:id',
+  loadComponent: () => import('./pago/pago.page').then(m => m.PagoPage)
+}
 ];

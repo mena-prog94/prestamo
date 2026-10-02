@@ -1,4 +1,3 @@
-<!-- pago.page.html -->
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
@@ -27,22 +26,32 @@
     <h3>Detalles del Préstamo</h3>
     <p><strong>Monto Prestado:</strong> RD$ {{ data?.loanAmount | number }}</p>
     <p><strong>Modalidad:</strong> {{ data?.loanType | titlecase }}</p>
-    <p><strong>Total a Pagar (con interés):</strong> RD$ {{ data?.totalToPay | number:'1.2-2' }}</p>
+    <p><strong>Total a Pagar:</strong> RD$ {{ data?.totalToPay | number:'1.2-2' }}</p>
     <p><strong>Valor por Cuota:</strong> <span class="highlight-amount">RD$ {{ data?.installmentAmount | number:'1.2-2' }}</span></p>
 
     <!-- Progreso actual de cuotas -->
     <div class="progress-box">
-      <h3>Progreso de Cuotas Pagadas: {{ data?.pagosRegistrados || 0 }} de {{ data?.totalInstallments }}</h3>
+      <h3>Progreso de Cuotas: {{ data?.pagosRegistrados || 0 }} de {{ data?.totalInstallments }}</h3>
+    </div>
+
+    <!-- Historial de Pagos Realizados -->
+    <div *ngIf="historialPagos.length > 0" class="history-section">
+      <h3>Historial de Pagos</h3>
+      <ul class="history-list">
+        <li *ngFor="let pago of historialPagos">
+          <span>Cuota #{{ pago.cuotaNumero }} - RD$ {{ pago.montoPagado | number:'1.2-2' }}</span>
+          <small>{{ pago.fecha | date:'mediumDate' }}</small>
+        </li>
+      </ul>
     </div>
   </div>
 
   <!-- Botones de Acción -->
   <div class="button-group" style="margin-top: 25px;">
-    <ion-button expand="block" color="success" (click)="confirmarRegistroPago()" style="margin-bottom: 12px;">
-      💵 Registrar Pago (Pago {{ (data?.pagosRegistrados || 0) + 1 }} de {{ data?.totalInstallments }})
+    <ion-button expand="block" color="success" (click)="confirmarRegistroPago()" [disabled]="isSubmitting" style="margin-bottom: 12px;">
+      💵 {{ isSubmitting ? 'Registrando...' : 'Registrar Pago (' + ((data?.pagosRegistrados || 0) + 1) + '/' + data?.totalInstallments + ')' }}
     </ion-button>
 
-    <!-- Nuevo botón específico para compartir PDF por WhatsApp -->
     <ion-button expand="block" color="tertiary" (click)="compartirPdfWhatsApp()" style="margin-bottom: 12px;">
       💬 Compartir PDF por WhatsApp
     </ion-button>
@@ -52,7 +61,7 @@
     </ion-button>
 
     <ion-button *ngIf="data && data.pagosRegistrados >= data.totalInstallments" color="success" expand="block" (click)="renovarPrestamo()" style="margin-bottom: 12px;">
-      Renovar Préstamo
+      🔄 Renovar Préstamo
     </ion-button>
 
     <ion-button expand="block" fill="outline" color="medium" (click)="goBack()">
