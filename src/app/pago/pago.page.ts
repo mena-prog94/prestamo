@@ -153,13 +153,32 @@ export class PagoPage implements OnInit {
     }
   }
 
-  async compartirPdfWhatsApp() {
+async compartirPdfWhatsApp() {
+    // 1. Validar que el elemento exista en el DOM
     const element = document.getElementById('receipt-content');
+    if (!element) {
+      console.error('No se encontró el elemento #receipt-content en el DOM.');
+      return;
+    }
+
+    // 2. Dar un pequeño respiro al DOM para asegurar que esté completamente renderizado
+    await new Promise(resolve => setTimeout(resolve, 350));
+
+    // 3. Validar dimensiones reales antes de llamar a html2pdf
+    if (element.offsetWidth === 0 || element.offsetHeight === 0) {
+      console.error('El elemento tiene un ancho o alto de 0px.');
+      return;
+    }
+
     const opt = {
       margin: 10,
       filename: `Recibo_Pago_${this.data.clientName}_Cuota_${this.data.pagosRegistrados}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false 
+      },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -181,7 +200,6 @@ export class PagoPage implements OnInit {
       console.error('Error al compartir PDF:', error);
     }
   }
-
   printReceipt() {
     window.print();
   }
