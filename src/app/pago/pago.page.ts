@@ -26,7 +26,7 @@ export class PagoPage implements OnInit {
   data: any = null;
   historialPagos: any[] = [];
   currentDate: string = '';
-  isSubmitting: boolean = false; // Bandera para evitar doble clic
+  isSubmitting: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -75,7 +75,6 @@ export class PagoPage implements OnInit {
       const querySnapshot = await getDocs(q);
       
       this.historialPagos = querySnapshot.docs.map(doc => doc.data());
-      // Ordenar por número de cuota
       this.historialPagos.sort((a, b) => a.cuotaNumero - b.cuotaNumero);
     } catch (error) {
       console.error('Error al cargar historial:', error);
@@ -83,7 +82,7 @@ export class PagoPage implements OnInit {
   }
 
   async confirmarRegistroPago() {
-    if (this.isSubmitting) return; // Bloquea si ya se está procesando
+    if (this.isSubmitting || !this.data) return;
 
     if (this.data.pagosRegistrados >= this.data.totalInstallments) {
       const alert = await this.alertController.create({
@@ -115,6 +114,7 @@ export class PagoPage implements OnInit {
   }
 
   async ejecutarRegistroPago() {
+    if (!this.data) return;
     this.isSubmitting = true;
     this.data.pagosRegistrados++;
     const fechaPago = new Date().toISOString();
@@ -147,24 +147,23 @@ export class PagoPage implements OnInit {
 
     } catch (error) {
       console.error('Error al registrar el pago:', error);
-      this.data.pagosRegistrados--; // Revertir en caso de error
+      this.data.pagosRegistrados--; 
     } finally {
       this.isSubmitting = false;
     }
   }
 
-async compartirPdfWhatsApp() {
-    // 1. Validar que el elemento exista en el DOM
+  async compartirPdfWhatsApp() {
+    if (!this.data) return;
+
     const element = document.getElementById('receipt-content');
     if (!element) {
       console.error('No se encontró el elemento #receipt-content en el DOM.');
       return;
     }
 
-    // 2. Dar un pequeño respiro al DOM para asegurar que esté completamente renderizado
     await new Promise(resolve => setTimeout(resolve, 350));
 
-    // 3. Validar dimensiones reales antes de llamar a html2pdf
     if (element.offsetWidth === 0 || element.offsetHeight === 0) {
       console.error('El elemento tiene un ancho o alto de 0px.');
       return;
@@ -184,7 +183,7 @@ async compartirPdfWhatsApp() {
 
     try {
       const pdfBlob = await (html2pdf() as any).from(element).set(opt).output('blob');
-      const file = new File([pdfBlob], `Recibo_Cuota_${this.data.pagosRegistrados}.pdf`, { type: 'application/pdf' });
+      const file = new File([pdfBlob], `Recibo_Cuota_${this.data?.pagosRegistrados}.pdf`, { type: 'application/pdf' });
 
       const mensajeTexto = `Hola *${this.data.clientName}*, aquí tienes tu recibo de pago de la cuota ${this.data.pagosRegistrados} de ${this.data.totalInstallments} por RD$ ${this.data.installmentAmount.toLocaleString('en-US', {minimumFractionDigits: 2})}. - *Préstamos Mena*`;
 
@@ -200,11 +199,13 @@ async compartirPdfWhatsApp() {
       console.error('Error al compartir PDF:', error);
     }
   }
+
   printReceipt() {
     window.print();
   }
 
   renovarPrestamo() {
+    if (!this.data) return;
     const datosClienteParaRenovar = {
       clientName: this.data.clientName,
       clientCedula: this.data.clientCedula,
