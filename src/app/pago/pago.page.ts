@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonButton, IonHeader, IonToolbar, IonTitle, IonButtons, IonMenuButton, AlertController } from '@ionic/angular/standalone';
 import { Firestore, doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from '@angular/fire/firestore';
 import html2pdf from 'html2pdf.js';
+import html2canvas from 'html2canvas';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-pago',
@@ -153,52 +155,64 @@ export class PagoPage implements OnInit {
     }
   }
 
-  async compartirPdfWhatsApp() {
-    if (!this.data) return;
+async compartirPdfWhatsApp() {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 300)); // Damos un respiro mayor al DOM
 
     const element = document.getElementById('receipt-content');
     if (!element) {
-      console.error('No se encontró el elemento #receipt-content en el DOM.');
+      alert('No se encontró el recibo.');
       return;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 350));
-
-    if (element.offsetWidth === 0 || element.offsetHeight === 0) {
-      console.error('El elemento tiene un ancho o alto de 0px.');
-      return;
-    }
-
-    const opt = {
-      margin: 10,
-      filename: `Recibo_Pago_${this.data.clientName}_Cuota_${this.data.pagosRegistrados}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true, 
-        logging: false 
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    try {
-      const pdfBlob = await (html2pdf() as any).from(element).set(opt).output('blob');
-      const file = new File([pdfBlob], `Recibo_Cuota_${this.data?.pagosRegistrados}.pdf`, { type: 'application/pdf' });
-
-      const mensajeTexto = `Hola *${this.data.clientName}*, aquí tienes tu recibo de pago de la cuota ${this.data.pagosRegistrados} de ${this.data.totalInstallments} por RD$ ${this.data.installmentAmount.toLocaleString('en-US', {minimumFractionDigits: 2})}. - *Préstamos Mena*`;
-
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'Recibo de Pago', text: mensajeTexto });
-      } else {
-        (html2pdf() as any).from(element).set(opt).save();
-        const telefonoLimpio = this.data.clientPhone ? this.data.clientPhone.replace(/\D/g, '') : '';
-        const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefonoLimpio}&text=${encodeURIComponent(mensajeTexto)}`;
-        window.open(urlWhatsApp, '_blank');
+    // Generar el canvas con configuraciones seguras para evitar errores de renderizado de fondo
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false, // Evita que falle por logs internos de canvas
+      onclone: (clonedDoc) => {
+        // Opcional: Si hay algún elemento que cause problemas en la copia clonada, puedes ajustarlo aquí
+        const clonedElement = clonedDoc.getElementById('receipt-content');
+        if (clonedElement) {
+          clonedElement.style.backgroundImage = 'none'; // Elimina fondos complejos si causan conflicto
+        }
       }
-    } catch (error) {
-      console.error('Error al compartir PDF:', error);
+    });
+
+    if (canvas.width === 0 || canvas.height === 0) {
+      alert('El recibo tiene dimensiones de 0.');
+      return;
     }
+
+    const base64Image = canvas.toDataURL('image/png');
+
+    // Compartir mediante la API web o descarga de respaldo
+    if (navigator.share) {
+      const blob = await (await fetch(base64Image)).blob();
+      const file = new File([blob], 'recibo-pago.png', { type: 'image/png' });
+      
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Recibo de Préstamo',
+          text: `Recibo de ${this.data.clientName}`,
+          files: [file]
+        });
+        return;
+      }
+    }
+
+    // Descarga directa si no hay soporte de compartir archivos
+    const link = document.createElement('a');
+    link.href = base64Image;
+    link.download = `recibo-${this.data.clientCedula || 'pago'}.png`;
+    link.click();
+
+  } catch (error: any) {
+    console.error('Error detallado al compartir:', error);
+    alert('Ocurrió un error al intentar compartir: ' + (error?.message || error));
   }
+}
 
   printReceipt() {
     window.print();
